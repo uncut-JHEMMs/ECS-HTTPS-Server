@@ -2,14 +2,16 @@
 
 clear
 
+cert=$1
+key=$2
+pfx=$3
+
 if [ $1 == test ]
 then
     echo "Test start..."
-    openssl pkcs12 -info -in server/ca/pfx/server.ca.bundle.pfx
+    openssl pkcs12 -info -in $2
 else
-
-    mkdir server/ca/pfx
     
-    openssl pkcs12 -export -out server/ca/pfx/server.ca.bundle.pfx -inkey server/ca/private/server.ca.key.pem -in server/ca/certs/server.ca.cert.pem
+    openssl pkcs12 -export -out $pfx -inkey $key -in $cert
 
 fi
