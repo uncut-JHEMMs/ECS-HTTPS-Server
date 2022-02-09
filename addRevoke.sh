@@ -9,8 +9,9 @@ then
     
 else
     
-cert=$1
-#Add certificate to revokation list
-openssl ca -config openssl-ca.cnf -revoke $cert
+    conf=$1
+    cert=$2
+    #Add certificate to revokation list
+    openssl ca -config $conf -revoke $cert
 
 fi
