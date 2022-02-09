@@ -42,7 +42,7 @@ default_ca	= CA_default		# The default ca section
 ####################################################################
 [ CA_default ]
 
-dir		= /root/ca		# Where everything is kept
+dir		= document/ca		# Where everything is kept
 certs		= $dir/certs		# Where the issued certs are kept
 crl_dir		= $dir/crl		# Where the issued crl are kept
 database	= $dir/index.txt	# database index file.
@@ -50,12 +50,12 @@ database	= $dir/index.txt	# database index file.
 					# several certs with same subject.
 new_certs_dir	= $dir/newcerts		# default place for new certs.
 
-certificate	= $dir/cacert.pem 	# The CA certificate
+certificate	= $dir/certs/document.ca.cert.pem 	# The CA certificate
 serial		= $dir/serial 		# The current serial number
 crlnumber	= $dir/crlnumber	# the current crl number
 					# must be commented out to leave a V1 CRL
-crl		= $dir/crl.pem 		# The current CRL
-private_key	= $dir/private/cakey.pem# The private key
+crl		= $dir/clr/document.ca.crl 		# The current CRL
+private_key	= $dir/private/document.ca.key.pem	# The private key
 
 x509_extensions	= usr_cert		# The extensions to add to the cert
 
@@ -81,6 +81,9 @@ preserve	= no			# keep passed DN ordering
 # For type CA, the listed attributes must be the same, and the optional
 # and supplied fields are just that :-)
 policy		= policy_match
+
+[ server_cert ]
+crlDistributionsPoints = server/ca/crl
 
 # For the CA policy
 [ policy_match ]
