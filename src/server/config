@@ -1,0 +1,6 @@
+{
+	"port" : 8080,
+	"max_threads" : 4,
+	"max_connections" : 15,
+	"connection_timeout" : 300000
+}
