@@ -10,7 +10,7 @@ else
     csr=$2
     
     #Generate key
-    openssl genrsa -aes256 -out $key 4096
+    openssl genrsa -out $key 4096
     
     chmod 400 $key
     

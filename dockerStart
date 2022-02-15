@@ -1,0 +1,12 @@
+#!/bin/bash
+
+sudo docker build -t capstone .
+
+if [ $1 -gt -1 ] && [ $1 -lt 65536 ]
+then
+    sudo docker run -p $1:$1 -it --privileged capstone 
+
+else
+    sudo docker run -p 443:443 -it --privileged capstone
+
+fi

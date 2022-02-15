@@ -43,47 +43,12 @@ then
 else
 
     #Generate directories
-    mkdir root root/ca
+    ./createCA_Dir.sh root
     
-    cd root/ca/
-    
-    mkdir crl private certs newcerts
-    echo "01" > serial
-    echo 1000 > crlnumber
-    touch index.txt
-    
-    chmod 700 private
-    
-    cd ../../
-    
-    mkdir server server/ca/
-    
-    cd server/ca/
-    
-    mkdir crl private certs newcerts pfx
-    
-    echo "01" > serial
-    
-    echo 1000 > crlnumber
-    
-    chmod 700 private
+    ./createCA_Dir.sh server
 
+    ./createCA_Dir.sh document
 
-    cd ../../
-    mkdir document document/ca
-
-    cd document/ca/
-
-    mkdir crl private certs newcerts pfx
-
-    echo "01" > serial
-    echo 1000 > crlnumber
-    
-    touch index.txt
-
-    chmod 700 private
-
-    cd ../../
     mv openssl-sca.cnf server/ca/
     mv openssl-dca.cnf document/ca/
     
@@ -91,7 +56,7 @@ else
     key=root/ca/private/root.ca.key.pem
     cert=root/ca/certs/root.ca.cert.pem
     
-    openssl genrsa -aes256 -out $key 4096
+    openssl genrsa -out $key 4096
     chmod 400 $key
     
     #Generate the certificate authority for root.
@@ -109,13 +74,9 @@ else
     key=server/ca/private/server.ca.key.pem
     cert=server/ca/certs/server.ca.cert.pem
     csr=server/ca/server.csr
-    
-    openssl genrsa -aes256 -out $key 4096
-    chmod 400 $key
-    
-    #Generate the csr for server.
-    openssl req -new -key $key -out $csr 
 
+    ./createCSR.sh $key $csr
+    
     #Generate the server ca from csr
     openssl ca -config openssl-rca.cnf -out $cert -in $csr
 
@@ -131,31 +92,28 @@ else
     openssl pkcs12 -export -out $pfx -inkey $key -in server/ca/certs/server.ca.cert.pem
     chmod 444 $cert
     
-    #Generate a private key for document
-    
+
+    #Generate csr for document
     key=document/ca/private/document.ca.key.pem
     cert=document/ca/certs/document.ca.cert.pem
     csr=document/ca/document.csr
     
-    openssl genrsa -aes256 -out $key 4096
-    chmod 400 $key
-    
     #Generate the csr for document.
-    openssl req -new -key $key -out $csr
-
+    ./createCSR.sh $key $csr
+    
     #sign document csr
     openssl ca -config openssl-rca.cnf -out $cert -in $csr    
 
     #Generate CRL for document
     openssl ca -config openssl-rca.cnf -gencrl -out document/ca/crl/document.ca.crl
 
-    
     #Generate PFX bundle for document
     
     pfx=document/ca/pfx/document.ca.pfx
     
     cat root/ca/certs/root.ca.cert.pem >> $cert
     chmod 444 $cert
+
     openssl pkcs12 -export -out $pfx -inkey $key -in document/ca/certs/document.ca.cert.pem
     
 fi
