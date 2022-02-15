@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <string>
 #include <cassert>
+#include <thread>
+#include "Logging.h"
 
 class hello_world_resource : public httpserver::http_resource {
 public:
@@ -16,7 +18,19 @@ public:
 int main(int argc, char** argv) {
 
   httpserver::create_webserver config;
+  std::string str = "log";
   
+  Logging log(&str);
+
+  //start logging thread with a lambda
+  std::thread th([&log]() {
+		   int i = 10;
+		   while(i != 0){
+		     log.log();
+		     i--;
+		   }
+		 });
+  //If config file is provided via command line.
   if(argc > 1){
     Json::Value read;
     std::ifstream file(argv[1]);
@@ -48,6 +62,8 @@ int main(int argc, char** argv) {
     if(read.get("connection_timeout", "NULL") != "NULL")
       config.connection_timeout(read.get("connection_timeout", "NULL").asInt());
   }
+  
+  //If config file is not provided then check environment variables.
   else{
     char* str = nullptr;
     
@@ -73,12 +89,14 @@ int main(int argc, char** argv) {
       config.memory_limit(std::stoi(str));
   }
   config.use_dual_stack();
+
+
+  //HTTPS configurations
   config.use_ssl()
     //problem. Still don't know what the difference is supposed to be between trust and certificate.
     .https_mem_trust("../pki/server/ca/certs/server.ca.cert.pem")
     //rsa private key. Doesn't use aes to encrypt and thus works.
-    .https_mem_key("../pki/server/ca/private/server.ca.key.pem")
-      
+    .https_mem_key("../pki/server/ca/private/server.ca.key.pem") 
     .https_mem_cert("../pki/server/ca/certs/server.ca.cert.pem");
   
   httpserver::webserver ws = config;
@@ -86,6 +104,7 @@ int main(int argc, char** argv) {
   hello_world_resource hwr;
   ws.register_resource("/hello", &hwr);
   ws.start(true);//start the server (blocking)
-  
+
+  th.join();
   return 0;
 }

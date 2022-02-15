@@ -5,10 +5,10 @@ cxxflags = -std=c++17
 
 all:$(target)
 $(target): $(objs)
-	clang++ -o $(target) $(objs) -ljsoncpp -lhttpserver
+	clang++ -o $(target) $(objs) -ljsoncpp -lhttpserver -pthread
 
 main.o: main.cpp
 	clang++ $(cflags) $(cxxflags) main.cpp
 
 clean:
-	rm -r *.o $(target)
+	rm -r *.o $(target) log
