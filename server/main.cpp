@@ -4,9 +4,10 @@
 #include <cstdlib>
 #include <string>
 #include <cassert>
-<<<<<<< HEAD:server/main.cpp
 #include "ThreadPool.h"
 #include <iostream>
+#include <thread>
+#include "Logging.h"
 
 #define MY_OPAQUE "11733b200778ce33060f31c9af70a870ba96ddd4"
 
@@ -24,10 +25,6 @@ class digest_resource : public httpserver::http_resource {
          return std::shared_ptr<httpserver::string_response>(new httpserver::string_response("SUCCESS", 200, "text/plain"));
      }
 };
-=======
-#include <thread>
-#include "Logging.h"
->>>>>>> origin/development:src/server/main.cpp
 
 class hello_world_resource : public httpserver::http_resource {
 public:
@@ -42,10 +39,8 @@ int main(int argc, char** argv) {
   httpserver::create_webserver config;
   std::string str = "log";
   
-<<<<<<< HEAD:server/main.cpp
   ThreadPool th;
   
-=======
   Logging log(&str);
 
   //start logging thread with a lambda
@@ -57,7 +52,6 @@ int main(int argc, char** argv) {
 		   }
 		 });
   //If config file is provided via command line.
->>>>>>> origin/development:src/server/main.cpp
   if(argc > 1){
     Json::Value read;
     std::ifstream file(argv[1]);
@@ -116,10 +110,7 @@ int main(int argc, char** argv) {
       config.memory_limit(std::stoi(str));
   }
   config.use_dual_stack();
-<<<<<<< HEAD:server/main.cpp
   config.start_method(httpserver::http::http_utils::INTERNAL_SELECT);
-=======
-
 
   //HTTPS configurations
   config.use_ssl()
@@ -128,7 +119,6 @@ int main(int argc, char** argv) {
     //rsa private key. Doesn't use aes to encrypt and thus works.
     .https_mem_key("../pki/server/ca/private/server.ca.key.pem") 
     .https_mem_cert("../pki/server/ca/certs/server.ca.cert.pem");
->>>>>>> origin/development:src/server/main.cpp
   
   httpserver::webserver ws = config;
   
@@ -136,14 +126,8 @@ int main(int argc, char** argv) {
   digest_resource dg;
   
   ws.register_resource("/hello", &hwr);
-<<<<<<< HEAD:server/main.cpp
   ws.register_resource("/digest", &dg);
   //ws.start(true);//start the server (blocking)
   
-=======
-  ws.start(true);//start the server (blocking)
-
-  th.join();
->>>>>>> origin/development:src/server/main.cpp
   return 0;
 }
