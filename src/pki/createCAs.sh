@@ -87,9 +87,11 @@ else
     pfx=server/ca/pfx/server.ca.pfx
     
     #append root ca to server ca
-    cat root/ca/certs/root.ca.cert.pem >> $cert
+    cert_bundle=server/ca/certs/cert.bundle
+    cat $cert > $cert_bundle
+    cat root/ca/certs/root.ca.cert.pem >> $cert_bundle
     
-    openssl pkcs12 -export -out $pfx -inkey $key -in server/ca/certs/server.ca.cert.pem
+    openssl pkcs12 -export -out $pfx -inkey $key -in $cert_bundle
     chmod 444 $cert
     
 

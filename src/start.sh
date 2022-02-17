@@ -4,6 +4,6 @@ clear
 
 make
 
-./exec
+./exec $1
 
 make clean
