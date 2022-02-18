@@ -8,7 +8,7 @@ all:$(target)
 $(target): $(objs)
 	clang++ -o $(target) $(objs) -ljsoncpp -lhttpserver -pthread
 
-main.o: main.cpp server/ThreadPool.h server/ThreadSafeQueue.h
+main.o: main.cpp server/*
 	clang++ $(cflags) $(cxxflags) main.cpp
 
 clean:

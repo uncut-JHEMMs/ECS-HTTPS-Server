@@ -6,6 +6,8 @@
 #include <utility>
 #include "ServerConfiguration.h"
 #include <iostream>
+#include "resources/Hello_World_Resource.h"
+#include "Logging.h"
 
 class Server{
 private:
@@ -15,13 +17,20 @@ private:
   unsigned int m_connection_timeout = 180;
   unsigned int m_memory_limit = 0;
   httpserver::webserver m_ws;
+  Logging& log = Logging::createLog();
+  std::thread logging = std::thread(&Logging::write_thread, &log);
   
 public:
   ~Server(){
-    
+    log.Done();
+    logging.join();
   }
   
-  Server(): m_ws(httpserver::create_webserver(443)){}
+  Server() {
+    m_ws = httpserver::create_webserver(8080);
+    Hello_World_Resource res;
+    m_ws.register_resource("/hello", &res);
+  }
   
   Server(Server&& ser) noexcept(true) :
          m_port(std::exchange(ser.m_port, 0)),
@@ -29,6 +38,8 @@ public:
 	 m_max_connections(std::exchange(ser.m_max_connections, 0)),
 	 m_connection_timeout(std::exchange(ser.m_memory_limit, 0)),
 	 m_ws(std::move(ser.m_ws)) {
+    Hello_World_Resource res;
+    m_ws.register_resource("/hello", &res);
   }
 
   Server(const Server& ser) noexcept(true) :
@@ -36,21 +47,31 @@ public:
 	 m_max_threads(ser.m_max_threads),
 	 m_max_connections(ser.m_max_connections),
 	 m_connection_timeout(ser.m_connection_timeout),
-	 m_ws(ser.m_ws) {}
+	 m_ws(ser.m_ws) {
+    Hello_World_Resource res;
+    m_ws.register_resource("/hello", &res);
+  }
 
   Server(ServerConfiguration& config):
          m_port(config.m_port),
 	 m_max_threads(config.m_max_threads),
          m_max_connections(config.m_max_connections),
 	 m_connection_timeout(config.m_connection_timeout),
-	 m_ws(config.m_config) {}
+	 m_ws(config.m_config) {
+    Hello_World_Resource res;
+    m_ws.register_resource("/hello", &res);
+  }
 
   Server(ServerConfiguration&& config) noexcept(true) :
          m_port(std::exchange(config.m_port, 0)),		 
 	 m_max_threads(std::exchange(config.m_max_threads, 0)),
 	 m_max_connections(std::exchange(config.m_max_connections, 0)),
 	 m_connection_timeout(std::exchange(config.m_memory_limit, 0)),
-	 m_ws(std::move(config.m_config)) {}
+	 m_ws(std::move(config.m_config)) {
+    
+    Hello_World_Resource res;
+    m_ws.register_resource("/hello", &res);
+  }
 
   Server& operator=(Server& ser) = delete;
 
@@ -58,10 +79,16 @@ public:
 
   //true is yes false is no
   void start(bool blocking = true){
+    log.log("Server Started");
+    
     try{
       m_ws.start(blocking);
     }catch(std::invalid_argument e){
       std::cerr << e.what() << std::endl;
     }
+  }
+
+  void register_resource(httpserver::http_resource* res, std::string* str){
+    m_ws.register_resource(*str, res);
   }
 };
