@@ -81,6 +81,15 @@ preserve	= no			# keep passed DN ordering
 # For type CA, the listed attributes must be the same, and the optional
 # and supplied fields are just that :-)
 policy		= policy_match
+ssl_conf = ssl_sect
+
+[ ssl_sect ]
+
+system_default = system_default_sect
+
+[ system_default_sect ]
+MinProtocol = TLSv1.3
+CipherString = DEFAULT:@SECLEVEL=0
 
 [ server_cert ]
 crlDistributionsPoints = server/ca/crl

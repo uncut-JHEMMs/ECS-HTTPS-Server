@@ -5,27 +5,31 @@
 #include <condition_variable>
 
 template<class T>
-class ThreadSafeQueue{
+class Thread_Safe_Queue{
 private:
   std::deque<T> queue;
   std::mutex m;
   std::condition_variable cond;
   
 public:
-  ThreadSafeQueue(){}
+  Thread_Safe_Queue(){}
 
-  void push(T&& val) noexcept(true){
-    std::lock_guard<std::mutex> lock(m);
-    queue.push_back(std::move(val));
-    cond.notify_one();
+  bool empty(){
+    return queue.empty();
   }
-
-  void push(T& val){
+  
+  void push(T&& val) noexcept(true){
     std::lock_guard<std::mutex> lock(m);
     queue.push_back(val);
     cond.notify_one();
   }
 
+  void push(const T& val){
+    std::lock_guard<std::mutex> lock(m);
+    queue.push_back(val);
+    cond.notify_one();
+  }
+  
   T front(){
     std::unique_lock<std::mutex> lock(m);
     while(queue.empty())
@@ -41,21 +45,24 @@ public:
   }
 
   bool try_pop(){
-    if(m.try_lock() && !queue.empty()){
+
+    bool check = m.try_lock();
+    if(check && !queue.empty()){
       queue.pop_front();
-      return true;
     }
+      
     return false;
   }
 
   bool try_pop(T& val){
-    std::unique_lock<std::mutex> lock(m, std::defer_lock);
-    if(lock.try_lock() && !queue.empty()){
+    bool check = m.try_lock();
+    if(check && !queue.empty()){
+      
       val = queue.front();
-      queue.pop_front();      
+      queue.pop_front();
       return true;
     }
+  
     return false;
   }
 };
- 

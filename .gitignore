@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+*.*~
+*~
+
+src/pki/root/
+src/pki/server/
+src/pki/document/

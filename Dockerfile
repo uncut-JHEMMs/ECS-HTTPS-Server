@@ -20,7 +20,6 @@ RUN apt install -y locate
 RUN apt install -y sudo
 RUN git clone https://github.com/etr/libhttpserver.git
 
-#RUN cd libhttpserver/
 RUN mkdir libhttpserver/build
 RUN cd libhttpserver/ && ./bootstrap
 RUN cd /libhttpserver/build/ && ../configure
@@ -35,7 +34,12 @@ RUN rm -r /usr/include/jsoncpp
 #ENV LIBRARY_PATH=$LIBRARY_PATH:/usr/local/lib
 ENV port=$port
 
-COPY src/server/* src/server/
-COPY src/pki/* src/pki/
+#COPY src/server/* src/server/
+#COPY src/pki/* src/pki/
+#COPY src/makefile src
+#COPY src/start.sh src
+#COPY src/main.cpp src
+#COPY src/server/resources src/server/resources
+COPY src src
 
 WORKDIR src/
