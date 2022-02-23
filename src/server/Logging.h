@@ -33,7 +33,7 @@ public:
     return log;
   }
   
-  void log(std::string str){
+  void log(const std::string& str){
     queue.push(str);
   }
 

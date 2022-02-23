@@ -118,6 +118,7 @@ public:
       std::cerr << "Invalid Argument: " << e.what() << std::endl;
       return false;
     }
+   
     return true;
   }
   
@@ -125,7 +126,7 @@ public:
     Json::Value read;
     std::ifstream file(conf_fname);
     //Needs error checking/exception handling.
-    
+        
     if(!file.is_open()){
       std::cerr << "Couldn't open configuration file.";
       return false;
@@ -218,7 +219,7 @@ public:
 	 (cert = read.get("server_cert", "NULL").asString()) == "NULL")
 	return false;
     }
-
+    
     catch(const Json::LogicError& e){
       std::cerr << "Json Logic Error: " << e.what() << std::endl;
       return false;
@@ -233,6 +234,7 @@ public:
       std::cerr << "Json Error\n";
       return false;
     }
+    
     //problem. Still don't know what the difference is supposed to be between trust and certificate.
     try{
       m_config.https_mem_trust(CA)
@@ -246,5 +248,10 @@ public:
     }
     
     return true;
+  }
+
+  void log_access(void (*func)(const std::string&)){
+    m_config.log_access(func)
+      .log_error(func);
   }
 };

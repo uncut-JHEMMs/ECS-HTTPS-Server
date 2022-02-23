@@ -19,10 +19,10 @@ int main(int argc, char** argv) {
       return -1;
     }
   }
-  
+
+  cnf.log_access([](const std::string& str){Logging::createLog().log(str);});
   Server server(std::move(cnf));
   
   server.start();
-
   return 0;
 }

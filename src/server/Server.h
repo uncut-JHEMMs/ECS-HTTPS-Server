@@ -5,7 +5,6 @@
 #include <fstream>
 #include <utility>
 #include "ServerConfiguration.h"
-#include <iostream>
 #include "resources/Hello_World_Resource.h"
 #include "Logging.h"
 
@@ -26,8 +25,7 @@ public:
     logging.join();
   }
   
-  Server() {
-    m_ws = httpserver::create_webserver(8080);
+  Server(): m_ws(httpserver::create_webserver(8080)){
     Hello_World_Resource res;
     m_ws.register_resource("/hello", &res);
   }
@@ -69,8 +67,8 @@ public:
 	 m_connection_timeout(std::exchange(config.m_memory_limit, 0)),
 	 m_ws(std::move(config.m_config)) {
     
-    Hello_World_Resource res;
-    m_ws.register_resource("/hello", &res);
+    //Hello_World_Resource res;
+    //m_ws.register_resource("/hello", &res);
   }
 
   Server& operator=(Server& ser) = delete;
@@ -80,7 +78,8 @@ public:
   //true is yes false is no
   void start(bool blocking = true){
     log.log("Server Started");
-    
+    Hello_World_Resource r;
+    m_ws.register_resource("/hello", &r);
     try{
       m_ws.start(blocking);
     }catch(std::invalid_argument e){
