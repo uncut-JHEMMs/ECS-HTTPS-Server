@@ -2,15 +2,16 @@
 
 #include <fstream>
 #include <queue>
-#include <thread>
+#include "Thread_Safe_Queue.h"
 #include <ctime>
 #include <chrono>
+#include <thread>
 
 class Logging{
 
 private:
   std::ofstream m_file = std::ofstream("server_log");
-  std::queue<std::string> queue;
+  Thread_Safe_Queue<std::string> queue;
   bool done = false;
 
   Logging() = default;

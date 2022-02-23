@@ -1,6 +1,7 @@
 #include "server/Server.h"
 #include "server/ServerConfiguration.h"
 #include <utility>
+#include <iostream>
 
 int main(int argc, char** argv) {
 
@@ -20,7 +21,10 @@ int main(int argc, char** argv) {
     }
   }
 
-  cnf.log_access([](const std::string& str){Logging::createLog().log(str);});
+  cnf.log_access([](const std::string& str){
+		   Logging::createLog().log(str);
+		 });
+
   Server server(std::move(cnf));
   
   server.start();
