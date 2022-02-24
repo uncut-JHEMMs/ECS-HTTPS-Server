@@ -1,2 +1,12 @@
-Tue Feb 22 21:52:45 2022: Server Started
-Tue Feb 22 21:53:08 2022: /hello METHOD: GET
+Wed Feb 23 20:37:19 2022: Server Started
+Wed Feb 23 20:44:30 2022: /auth METHOD: GET
+Wed Feb 23 20:44:30 2022: /auth METHOD: GET
+Wed Feb 23 20:45:42 2022: /hello METHOD: GET
+Wed Feb 23 20:47:03 2022: /hello METHOD: GET
+Wed Feb 23 20:47:03 2022: /favicon.ico METHOD: GET
+Wed Feb 23 20:47:08 2022: /auth METHOD: GET
+Wed Feb 23 20:47:14 2022: /auth METHOD: GET
+Wed Feb 23 20:47:23 2022: /auth METHOD: GET
+Wed Feb 23 20:47:29 2022: /auth METHOD: GET
+Wed Feb 23 20:47:30 2022: /auth METHOD: GET
+Wed Feb 23 20:47:36 2022: /auth METHOD: GET
