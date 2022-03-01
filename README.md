@@ -1,1 +1,1 @@
-# ECS-HTTPS-Server
+To start the server you can run the dockerstart script giving it as a command line argument a port number. This will spin up the server in a docker container. Just be sure to read the README that is located in the server directory.
