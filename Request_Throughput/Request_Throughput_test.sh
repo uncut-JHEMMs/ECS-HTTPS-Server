@@ -24,6 +24,7 @@ do
 	    exit 1
     esac
 done
+
 echo "success,fail" > $ofile
 
 start=$SECONDS
@@ -57,9 +58,6 @@ do
 		fail=$((fail + 1))
 	    fi
 	done < $tmpfile
-
-	echo "success to fail"
-	echo $success : $fail
 	
 	next_ratio=$((success / fail))
 	total=$((total + 1))
@@ -88,5 +86,4 @@ average_fail=$((fail_sum / avg_count))
 
 average_max_ratio=$((average_succ / average_fail))
 
-echo "Duration: $duration"
 echo "Average max ratio $average_max_ratio"

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <json/json.h>
+#include <thread>
 
 class Server;
 
@@ -92,7 +93,10 @@ public:
     }
 
     m_config.use_dual_stack();
-    m_config.start_method(httpserver::http::http_utils::INTERNAL_SELECT);
+    if(std::thread::hardware_concurrency() > 4)
+      m_config.start_method(httpserver::http::http_utils::INTERNAL_SELECT);
+    else
+      m_config.start_method(httpserver::http::http_utils::THREAD_PER_CONNECTION);
     
     //HTTPS configurations
     m_config.use_ssl();

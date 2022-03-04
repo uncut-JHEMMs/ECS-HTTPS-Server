@@ -1,0 +1,9 @@
+{
+	"port" : 8080,
+	"max_threads" : 4,	
+	"max_connections" : 15,
+	"connection_timeout" : 180,
+	"server_ca" : "../../src/pki/server/ca/certs/server.ca.cert.pem",
+	"server_cert" : "../../src/pki/server/ca/certs/server.ca.cert.pem",
+	"server_key" : "../../src/pki/server/ca/private/server.ca.key.pem"
+}
