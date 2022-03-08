@@ -56,6 +56,7 @@ public:
 	 m_connection_timeout(std::exchange(config.m_memory_limit, 0)),
 	 m_ws(std::move(config.m_config)) {}
 
+
   Server& operator=(Server& ser) = delete;
 
   Server& operator=(Server&& ser) = delete;
@@ -63,21 +64,21 @@ public:
   //true is yes false is no
   void start(bool blocking = true){
     log.log("Server Started");
-    
+
     Hello_World_Resource r1;
     Digest_Resource r2;
     
     m_ws.register_resource("/hello", &r1);
     m_ws.register_resource("/auth", &r2);
-    
+
     try{
       m_ws.start(blocking);
     }catch(std::invalid_argument e){
       std::cerr << e.what() << std::endl;
     }
   }
-
-  void register_resource(httpserver::http_resource* res, std::string* str){
-    m_ws.register_resource(*str, res);
+  
+  bool stop(){
+    return m_ws.stop();
   }
 };
