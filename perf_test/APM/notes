@@ -1,1 +1,3 @@
 iftop is odd
+
+perf-top has some functionality similar to valgrind that gives a percentage related to the amount of time spent inside a function compared to the rest of the application.

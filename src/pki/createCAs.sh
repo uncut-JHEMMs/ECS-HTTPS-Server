@@ -104,7 +104,7 @@ else
     ./createCSR.sh $key $csr
     
     #sign document csr
-    openssl ca -config openssl-rca.cnf -out $cert -in $csr    
+    openssl ca -config openssl-rca.cnf -out $cert -in $csr
 
     #Generate CRL for document
     openssl ca -config openssl-rca.cnf -gencrl -out document/ca/crl/document.ca.crl

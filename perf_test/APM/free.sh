@@ -6,7 +6,7 @@ do
     case $opt in
 	s)
 	    #Doesn't return
-	    free -h -t -s $OPTARG
+	    free -h -t -w -s $OPTARG
 	    ;;
 	\?)
 	    echo "ERROR: -$OPTARG requires arguments"
@@ -15,6 +15,6 @@ do
     esac
 done
 
-free -h -t
+free -h -t -w
 
 exit 0

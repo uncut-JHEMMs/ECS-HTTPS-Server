@@ -12,5 +12,5 @@ do
     esac
 done
 
-iostat $count $interval
+iostat $count $interval -t -p ALL
 exit 0
