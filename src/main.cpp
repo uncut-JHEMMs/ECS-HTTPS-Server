@@ -2,7 +2,6 @@
 #include "server/ServerConfiguration.h"
 #include <utility>
 #include <iostream>
-#include <csignal>
 
 int main(int argc, char** argv) {
 
@@ -28,10 +27,8 @@ int main(int argc, char** argv) {
 
   Server server(std::move(cnf));
   
-  server.start(false);
-  
-  std::getchar();
-  
-  server.stop();
+  server.start(true);
+  //getchar();
+  //server.stop();
   return 0;
 }

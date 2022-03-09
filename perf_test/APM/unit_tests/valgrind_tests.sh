@@ -1,6 +1,8 @@
 #!/bin/bash
 
-cd ..; ./startCacheBranchProfiler.sh -c config -o cacheBranchProfiler.out &> /dev/null
+cd ..
+
+./startCacheBranchProfiler.sh -c config -o cacheBranchProfiler.out &> /dev/null
 
 if [ ! $? ]
 then
@@ -29,5 +31,13 @@ fi
 if [ ! $? ]
 then
     echo "HEAP PROFILER FAILED"
+    exit 1
+fi
+
+./startMemcheck.sh -o memCheck.out &> /dev/null                                                                      
+
+if [ ! $? ]   
+then
+    echo "MEMCHECK FAILED"    
     exit 1
 fi

@@ -74,16 +74,11 @@ then
 	exit 1
     fi
     
-    ./startMemcheck.sh > /dev/null
-    
-    if [ ! $? ]
-    then
-	echo "MEMCHECK FAILED"
-	exit 1
-    fi
-    
     echo "ALL TESTS PASSED"
 
+    pid=$(pgrep $exec)
+    sudo kill $pid
+    
 else
     echo "failed compilation"
     exit 1
