@@ -34,8 +34,15 @@ if [ ! $(clang++ -o $exec -g -Wall ../../src/main.cpp -lhttpserver -ljsoncpp -pt
 then
 
     valgrind --tool=callgrind --callgrind-out-file=$ofile ./$exec $config
-    #run a search to see different uses
 
+    echo
+    echo
+    echo
+    
+    callgrind_annotate $ofile
+
+    kcachegrind $ofile
+    
     rm -r $exec
     exit 0
 

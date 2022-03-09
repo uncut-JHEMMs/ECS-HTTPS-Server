@@ -4,7 +4,7 @@ exec=exec
 config=config
 ofile=output/massif.out
 
-while getopts "e:c:o:h" opt
+while getopts "e:c:o:bh" opt
 do
     case $opt in
 	o) ofile=$OPTARG
@@ -12,6 +12,8 @@ do
 	e) exec=$OPTARG
 	   ;;
 	c) config=$OPTARG
+	   ;;
+	b) bytes_flag=true
 	   ;;
 	h) echo "-e: executable file name"
 	   echo "-c: Server configuration file name"
@@ -32,8 +34,12 @@ fi
 
 if [ ! $(clang++ -g -Wall -o $exec ../../src/main.cpp -lhttpserver -ljsoncpp -pthread) ]
 then
-    valgrind --tool=massif --stacks=yes --massif-out-file=$ofile ./$exec $config
-    ms_print $ofile
+    
+    valgrind --tool=massif --stacks=yes --xtree-memory=full --xtree-memory-file=$ofile --massif-out-file=output/heapProfile.out ./$exec $config 
+    
+    kcachegrind $ofile
+	
+    ms_print output/heapProfile.out
     
     rm -r $exec
 fi
