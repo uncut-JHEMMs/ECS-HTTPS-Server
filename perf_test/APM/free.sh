@@ -16,4 +16,5 @@ do
 done
 
 free -h -t
+
 exit 0

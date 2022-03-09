@@ -15,7 +15,7 @@ pid=$(pgrep $exec)
 
 if [ ! $pid ]
 then
-    echo "Process was not found. Exitting"
+    echo "htop.sh: Process was not found. Exitting"
     exit 1
 fi
 

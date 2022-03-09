@@ -4,12 +4,14 @@ exec=exec
 config=config
 ofile=output/ofile
 
-while getopts "e:c:o:h" opt
+while getopts "e:c:o:bh" opt
 do
     case $opt in
 	c) config=$OPTARG
 	   ;;
 	o) ofile=$OPTARG
+	   ;;
+	b) bytes_flag=true
 	   ;;
 	e) exec=$OPTARG
 	   ;;
@@ -31,7 +33,15 @@ fi
 
 if [ ! $(clang++ -o $exec -g -Wall ../../src/main.cpp -lhttpserver -ljsoncpp -pthread) ]
 then
-    valgrind --tool=massif --massif-out-file=$ofile ./$exec $config
+    if [ $bytes_flag == true ]
+    then
+echo flag
+	valgrind --tool=massif --stacks=yes --time-unit=B --massif-out-file=$ofile ./$exec $config
+
+    else
+	valgrind --tool=massif --stacks=yes --massif-out-file=$ofile ./$exec $config
+    fi
+    
     ms_print $ofile
     rm -r $exec
     exit 0

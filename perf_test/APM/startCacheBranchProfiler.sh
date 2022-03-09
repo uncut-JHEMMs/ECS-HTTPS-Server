@@ -4,10 +4,10 @@ exec=exec
 config=config
 file=output/cachegrind.out
 
-while getopts "f:e:c:h" options
+while getopts "o:e:c:h" options
 do
     case $options in
-	f)
+	o)
 	    file=$OPTARG
 	    ;;
 	e)
@@ -32,9 +32,16 @@ then
     then
 	echo"$config: Does not exist"
     fi
-    
-    valgrind --tool=cachegrind --cachegrind-out-file=$file ./$exec $config 
 
+    valgrind --tool=cachegrind --cachegrind-out-file=$file1 ./$exec $config
+    
+    echo
+    echo
+    echo
+    echo "begin output file interpretation"
+    #cg_diff $file1 $file2
+    cg_annotate $file
+    
     rm -r $exec
     exit 0
 else
