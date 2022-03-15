@@ -2,6 +2,7 @@ target = exec
 objs = main.o
 cflags = -c -Wall -g
 cxxflags = -std=c++17
+data_files = emails.xml
 
 all: $(target)
 
@@ -12,4 +13,4 @@ main.o: main.cpp server/*
 	clang++ $(cflags) $(cxxflags) main.cpp 
 
 clean:
-	rm -r *.o $(target) 
+	rm -r *.o $(target) $(data_files)
