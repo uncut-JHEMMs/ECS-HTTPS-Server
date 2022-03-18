@@ -20,10 +20,10 @@ do
     esac
 done
 
-if [ ! -f $ifile ]
+if [ ! -f $ifile ] || [ "$ifile" == "" ]
 then
     echo "file does not exist"
     exit 1
 fi
 
-curl -o $ofile -k -d @$ifile "https://$dest:$port/users" &> /dev/null
+curl -XPOST -o $ofile -k -d @$ifile "https://$dest:$port/users" &> /dev/null

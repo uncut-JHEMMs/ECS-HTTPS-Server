@@ -7,7 +7,7 @@ data_files = emails.xml
 all: $(target)
 
 $(target): $(objs)
-	clang++ -o $(target) $(objs) -ljsoncpp -lhttpserver -pthread
+	clang++ -o $(target) $(objs) -ljsoncpp -lhttpserver -pthread -lxml2 -lxmlsec1
 
 main.o: main.cpp server/*
 	clang++ $(cflags) $(cxxflags) main.cpp 
