@@ -15,16 +15,16 @@ private:
   const std::shared_ptr<httpserver::http_response> render_POST(const httpserver::http_request& req){
 
     /*won't stay*/
-    char key[] = "../../pki/document/ca/private/document.ca.key.pem";
+    /*char key[] = "../../pki/document/ca/private/document.ca.key.pem";
     std::shared_ptr<char[]> keyptr(new char[50]);// = std::make_shared<char[]>(new char[50]);
     for(int i = 0; i < 50; i++)
       keyptr[i] = key[i];
-    DocumentSigning& signer = DocumentSigning::createDocumentSigner(keyptr);
-    
+
+    */
     std::string data_str = req.get_content();
 
+    //convert data string to cstring
     std::shared_ptr<char[]> data = std::make_shared<char[]>(data_str.size());
-    
     for(int i = 0; i < data_str.size(); i++){
       data[i] = data_str[i];
     }
@@ -41,11 +41,14 @@ private:
         ofile << "<email>" << node->value() << "." << node->next_sibling()->value() << "@smoothceeplusplus.com" << "</email>" << std::endl;
         
         node = node->next_sibling();
-	
       }	  
     }
     ofile.close();
     
+    DocumentSigning signer;
+
+    signer.sign("emails.xml");
+
     return std::shared_ptr<httpserver::http_response>(new httpserver::file_response("emails.xml"));
   }
 };

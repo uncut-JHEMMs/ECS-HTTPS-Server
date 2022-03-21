@@ -1,158 +1,135 @@
 #pragma once
 
-#define XMLSEC_CRYPTO_OPENSSL
-
-//#include <xmlsec/xmldsig.h>
+#include <string_view>
+#include <openssl/sha.h>
 #include <memory>
-#include "../Logging.h"
-//#include <libxml/tree.h>
-//#include <libxml/xmlmemory.h>
-//#include <libxml/parser.h>
-
-#ifndef XMLSEC_NO_XSLT
-#include <libxslt/xslt.h>
-#include <libxslt/security.h>
-#endif  //XMLSEC_NO_XSLT 
-
-//#include <xmlsec/xmlsec.h>
-#include <xmlsec/xmltree.h>
-#include <xmlsec/xmldsig.h>
-#include <xmlsec/crypto.h>
+#include <sstream>
+#include <array>
+#include <fstream>
+#include <utility>
 
 class DocumentSigning{
 private:
-  std::shared_ptr<char[]> private_key;
-  Logging& log = Logging::createLog();
+
+  static std::string private_key;
+  static std::string certificate;
   
-  DocumentSigning(std::shared_ptr<char[]> p_key){
-    this->private_key = p_key;
-    p_key = nullptr;
+  const std::array<char, 64> base64Mapping = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+				      'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+				      'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a',
+				      'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+				      'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+				      't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1',
+				      '2', '3', '4', '5', '6', '7', '8', '9', '+',
+				      '/'};
+  //Likely to be innefficient. Should look into updating.
+  std::stringstream base64_Encode(std::stringstream& data){
+
+    std::stringstream binary;
+    std::unique_ptr<char[]> tmparr = std::make_unique<char[]>(6);
+    
+    while(!data.eof()){
+      data.get(tmparr.get(), 7);
+      for(int i = 0; i < 6; i++){
+	{
+	  binary << std::bitset<8>(tmparr[i]);
+	}
+      }
+    }
+    
+    std::stringstream base64;
+    
+    while(!binary.eof()){
+      binary.get(tmparr.get(), 7);
+      {
+	base64 << base64Mapping[std::bitset<6>(tmparr.get()).to_ulong()];
+      }
+    }
+    
+    return base64;
   }
+  
+  std::stringstream hash_sha1(const std::string&& data){
 
-  DocumentSigning(DocumentSigning&) = delete;
-  DocumentSigning(DocumentSigning&&) = delete;
+    unsigned char* c_data = new unsigned char[data.size()];
+    for(int i = 0; i < data.size(); i++){
+      c_data[i] = data[i];
+    }
+    
+    unsigned char hash[SHA_DIGEST_LENGTH];
 
+    SHA1(c_data, sizeof(data) - 1, hash);
+    delete[] c_data;
+    
+    std::stringstream stream;
+    stream << hash;
+    
+    return stream;
+  }
+  
 public:
-  
-  DocumentSigning& operator=(DocumentSigning&& signer){
-    this->private_key = signer.private_key;
-    signer.private_key = nullptr;
-
-    return *this;
+  DocumentSigning() noexcept {
+    
   }
 
-  DocumentSigning& operator=(DocumentSigning&) = delete;
-  
-  static DocumentSigning& createDocumentSigner(const std::shared_ptr<char[]> p_key){
-    static DocumentSigning signer(p_key);
-
-#ifndef XMLSEC_NO_XSLT
-    xsltSecurityPrefsPtr xsltSecPrefs = NULL;
-#endif
-    
-    /* Init libxml and libxslt libraries */
-    xmlInitParser();
-    LIBXML_TEST_VERSION
-    xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
-    xmlSubstituteEntitiesDefault(1);
-#ifndef XMLSEC_NO_XSLT
-    xmlIndentTreeOutput = 1; 
-#endif
-    
-    #ifndef XMLSEC_NO_XSLT
-    /* disable everything */
-    xsltSecPrefs = xsltNewSecurityPrefs(); 
-    xsltSetSecurityPrefs(xsltSecPrefs,  XSLT_SECPREF_READ_FILE, xsltSecurityForbid);
-    xsltSetSecurityPrefs(xsltSecPrefs,  XSLT_SECPREF_WRITE_FILE, xsltSecurityForbid);
-    xsltSetSecurityPrefs(xsltSecPrefs,  XSLT_SECPREF_CREATE_DIRECTORY, xsltSecurityForbid);
-    xsltSetSecurityPrefs(xsltSecPrefs,  XSLT_SECPREF_READ_NETWORK, xsltSecurityForbid);
-    xsltSetSecurityPrefs(xsltSecPrefs,  XSLT_SECPREF_WRITE_NETWORK, xsltSecurityForbid);
-    xsltSetDefaultSecurityPrefs(xsltSecPrefs); 
-#endif
-    
-    if(xmlSecInit() < 0){
-      //log.log("Error: xmlsec initialization failed");
-    }
-
-    #ifdef XMLSEC_CRYPTO_DYNAMIC_LOADING
-    if(xmlSecCryptoDLLoadLibrary(NULL) < 0) {
-      log.log("Error: unable to load default xmlsec-crypto library. Make sure\nthat you have it installed and check shared libraries path\n (LD_LIBRARY_PATH and/or LTDL_LIBRARY_PATH) environment variables.\n");
-    }
-#endif
-
-    if(xmlSecCryptoAppInit(NULL) < 0) {
-      //log.log("Error: crypto initialization failed.\n");
-    }
-
-    if(xmlSecCryptoInit() < 0) {
-
-    }
-    
-    return signer;
+  static void setCertKey(std::string& cert){
+    certificate = cert;
   }
   
-  bool sign_file(const std::shared_ptr<char[]>& filename, int data_size){
+  static void setPrivateKey(std::string& p_key){
+    private_key = p_key;
+  }
+  
+  bool sign(std::string&& filename){
 
-    auto clean_up = [] (xmlSecDSigCtxPtr dsigCtx, xmlDocPtr doc){
-		      xmlSecDSigCtxDestroy(dsigCtx);
-		      xmlFreeDoc(doc);
-		    };
+    if(certificate == "" || private_key == "")
+      return false;
     
-    //load the file data to sign
-    xmlDocPtr doc = xmlParseFile(filename.get());//xmlParseMemory(filename.get(), data_size);
+    std::ifstream ifile(filename);
+    std::string data = "";
+    std::string tmp = "";
+    while(!ifile.eof()){
+      ifile >> tmp;
+      data += tmp;
+    }
     
-    if(doc == nullptr){
-      log.log("Problem signing document. Doc returned null.");
-      xmlFreeDoc(doc);
-      return false;
-    }
+    ifile.close();
 
-    //find the start node
-    xmlNodePtr node = xmlSecFindNode(xmlDocGetRootElement(doc), xmlSecNodeSignature, xmlSecDSigNs);
 
-    if(node == nullptr){
-      log.log("Problem signing document. Couldn't find root node.");
-      xmlFreeDoc(doc);
-      return false;
-    }
-
-    //Create the signature context
-    xmlSecDSigCtxPtr dsigCtx = xmlSecDSigCtxCreate(nullptr);
-
-    if(dsigCtx == nullptr){
-      log.log("Problem signing document. Failed to create signature context.");
-      clean_up(dsigCtx, doc);
-      return false;
-    }
-
-    //load private key
-    dsigCtx->signKey = xmlSecCryptoAppKeyLoad(private_key.get(), xmlSecKeyDataFormatPem, nullptr, nullptr, nullptr);
-    if(dsigCtx->signKey == nullptr){
-      log.log("Problem signing document. Failed to load private pem key.");
-      clean_up(dsigCtx, doc);
-      return false;
-    }
-
-    //set key name to the file name
+    std::stringstream signature;
+    signature << "<Envelope xmlns=\"urn:envelope\">\n"
+	      << "<emails>" << data << "\n</emails>\n"
+	      << "<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n"
+	      << "<SignedInfo>\n"
+	      << "<CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\" />\n"
+	      << "<SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha1\" />\n"
+	      << "<Reference URI=\"\">\n"
+	      << "<Transforms>\n"
+	      << "<Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\" />\n"
+	      << "</Transforms>"
+	      << "<DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha1\" />\n"
+	      << "<DigestValue></DigestValue>\n"
+	      << "</Reference>\n"
+	      << "</SignedInfo>\n"
+	      << "<SignatureValue></SignatureValue>\n"
+	      << "<KeyInfo>\n"
+	      << "</KeyInfo>"
+	      << "<X509Data>"
+	      << "<X509Certificate>"
+	      << "</X509Certificate>"
+	      << "</X509Data>"
+	      << "</Signature>"
+	      << "</Envelope>";
     
-    if(xmlSecKeySetName(dsigCtx->signKey, (const unsigned char*) private_key.get()) < 0){
-      log.log("Problem signing document. Failed to set key name.");
-      clean_up(dsigCtx, doc);
-      return false;
-    }
+    std::string ssData = signature.str();
+    
+    std::stringstream hashed_data = hash_sha1(std::move(ssData));
+    std::stringstream digestValue = base64_Encode(hashed_data);
 
-    //sign the data
-    if(xmlSecDSigCtxSign(dsigCtx, node) < 0){
-      log.log("Problem signing document. Signature failed.");
-      clean_up(dsigCtx, doc);
-      return false;
-    }
-
-    xmlDocDump(stdout, doc);
-
-    //clean up
-    clean_up(dsigCtx, doc);
     
     return true;
   }
 };
+
+std::string DocumentSigning::private_key = "";
+std::string DocumentSigning::certificate = "";
