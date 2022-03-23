@@ -8,6 +8,7 @@
 #include "resources/Hello_World_Resource.h"
 #include "resources/Digest_Resource.h"
 #include "Logging.h"
+#include "resources/Email_Gen_resource.h"
 
 class Server{
 private:
@@ -67,10 +68,12 @@ public:
 
     Hello_World_Resource r1;
     Digest_Resource r2;
-    
+    Email_Gen_resource r3;
+   
     m_ws.register_resource("/hello", &r1);
     m_ws.register_resource("/auth", &r2);
-
+    m_ws.register_resource("/users", &r3);
+    
     try{
       m_ws.start(blocking);
     }catch(std::invalid_argument e){

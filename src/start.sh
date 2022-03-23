@@ -1,19 +1,26 @@
 #!/bin/bash
 
 clear
-cfile="server/config"
 
-while getopts "i:" opt
+config=server/config
+
+while getopts i: opt
 do
     case $opt in
-	i) $cfile=$OPTARG
+	i) config=$OPTARG
 	   ;;
-	\?) echo "-$opt: Arguments required"
+	\?) echo "-$opt: Requires Arguments."
     esac
 done
 
+if [ ! -f "$config" ]
+then
+    echo "$config file does not exist"
+    exit 1
+fi
+
 make
 
-./exec $cfile
+./exec $config
 
 make clean
