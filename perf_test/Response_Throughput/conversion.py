@@ -1,5 +1,5 @@
 import sys
-
+#converts the commannd line argument of bits per second to MB per second.
 def main():
     if len(sys.argv) < 2:
         print("No value passed in. Exitting")

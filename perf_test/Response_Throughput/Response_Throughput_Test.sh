@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Uses a file full of data and calculates the max throughput
 function max(){
 
     local max=0
@@ -31,7 +32,7 @@ do
 	n) tcount=$OPTARG
 	   ;;
 	d) dest=$OPTARG
-	   ;;
+ 	   ;;
 	p) port=$OPTARG
 	   ;;
 	h) echo "-v: variable payload on (0) variable payload off (1)"
@@ -52,11 +53,12 @@ fi
 
 tmpfile=tmpfile
 
+#sends variable or non-variable paylods asynchronously to the server and puts the upload times in a flat file for parsing.
 if [ $variable -eq 1 ]
 then
     for i in $(seq 0 $((tcount - 1)))
     do
-	curl -k -s -o /dev/null -d @${data[0]} -w "%{speed_upload}\n" https://$dest:$port/hello &>> tmpfile &
+	curl -k -s -o /dev/null -d @${data[0]} -w "%{speed_upload}\n" https://$dest:$port/hello &>> $tmpfile &
     done
 
     wait
@@ -66,7 +68,7 @@ else
     #variable payload selected.
     for i in $(seq 0 $((tcount - 1)))
     do
-	curl -k -s -o /dev/null -d @${data[$(expr $i % $size)]} -w "%{speed_upload}\n" https://$dest:$port/hello &>> tmpfile &
+	curl -k -s -o /dev/null -d @${data[$(expr $i % $size)]} -w "%{speed_upload}\n" https://$dest:$port/hello &>> $tmpfile &
     done
 
     wait
@@ -74,6 +76,7 @@ else
     max_val=$(max)
 fi
 
+#converts float value of bits per second to MB per second. Bash can't seem to operate on floats.
 python3 conversion.py $max_val
 
 rm -r tmpfile
