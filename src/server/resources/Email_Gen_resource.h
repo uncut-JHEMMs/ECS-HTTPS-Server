@@ -11,12 +11,11 @@ class Email_Gen_resource : public httpserver::http_resource {
 
 private:
   
-  //std::shared_ptr<DocumentSigning> signer;
   const std::shared_ptr<httpserver::http_response> render_POST(const httpserver::http_request& req){
 
     std::string data_str = req.get_content();
 
-    //convert data string to cstring
+    //convert data string to cstring to xml parsing
     std::shared_ptr<char[]> data = std::make_shared<char[]>(data_str.size());
     for(int i = 0; i < data_str.size(); i++){
       data[i] = data_str[i];
@@ -26,6 +25,7 @@ private:
     
     doc.parse<0>(data.get());
 
+    //output the created emails to emails.xml
     std::ofstream ofile("emails.xml");
     for(rapidxml::xml_node<>* node = doc.first_node(); node; node = node->next_sibling()){
             
@@ -38,7 +38,7 @@ private:
     ofile.close();
     
     DocumentSigning signer;
-
+    
     signer.sign("emails.xml");
 
     return std::shared_ptr<httpserver::http_response>(new httpserver::file_response("emails.xml"));

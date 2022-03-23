@@ -4,6 +4,7 @@
 #include <openssl/sha.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
+#include <openssl/evp.h>
 #include <memory>
 #include <sstream>
 #include <array>
@@ -54,7 +55,8 @@ private:
     }
     return base64;
   }
-  
+
+  //hash the data using sha1. Look into using something better.
   std::stringstream hash_sha1(const std::string&& data){
     
     unsigned char* c_data = new unsigned char[data.size()];
@@ -74,7 +76,7 @@ private:
     return stream;
   }
 
-  //Got some boken code near the end
+  //sign document using openssl rsa algorithm
   bool RSASign(const unsigned char* Msg,
               size_t MsgLen,
               unsigned char** EncMsg,
@@ -104,7 +106,7 @@ private:
       return false;
     }
     
-    //EVP_MD_CTX_cleanup(m_RSASignCtx);
+    EVP_MD_CTX_reset(m_RSASignCtx);
     return true;
   }
   
@@ -113,6 +115,7 @@ public:
     
   }
 
+  //reads in a certificate to put in the document.
   static void setCert(std::string&& cert){
 
     std::ifstream ifile(cert.c_str());
@@ -127,7 +130,8 @@ public:
     else
       log.log("ERROR: Could not open document signing certificate.");
   }
-  
+
+  //Reads in a private key to sign the document.
   static void setPrivateKey(std::string&& p_key){
     
     std::ifstream ifile(p_key.c_str());
@@ -151,7 +155,7 @@ public:
       log.log("ERROR: Could not open document signing private key.");
   }
 
-  
+  //Takes a file to be signed and signs it.
   bool sign(std::string&& filename){
 
     if(certificate == "" || private_key == "")
@@ -197,7 +201,7 @@ public:
     std::stringstream base64 = base64_Encode(hashed_data);
     std::string search = signature.str();
     
-    //lambda for inserting data into a string.
+    //lambda for inserting data into a string. Used to update template envelope
     auto stringInsert = [](std::string& str, const std::string&& begFind, const std::string&& endFind, const std::string&& insert) mutable {
 			  str.insert(str.find(endFind, str.find(begFind)) + endFind.size(), insert);
 			};
@@ -208,7 +212,7 @@ public:
     stringInsert(search, "<X509Data", ">", "<X509Certificate></X509Certificate>\n");
     signature << search;
     
-    //signature value start
+    //sign document using private key.
     hashed_data = hash_sha1(std::move(signature.str()));
 
     std::string plaintext = hashed_data.str();
@@ -220,6 +224,8 @@ public:
     base64 = base64_Encode(signatureValue);
     
     stringInsert(search, "<SignatureValue", ">", base64.str());
+
+    //Insert the certificate into the document.
     stringInsert(search, "<X509Certificate", ">", std::move(certificate));
 
     delete[] encMessage;
