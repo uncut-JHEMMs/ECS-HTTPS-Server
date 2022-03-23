@@ -14,13 +14,6 @@ private:
   //std::shared_ptr<DocumentSigning> signer;
   const std::shared_ptr<httpserver::http_response> render_POST(const httpserver::http_request& req){
 
-    /*won't stay*/
-    /*char key[] = "../../pki/document/ca/private/document.ca.key.pem";
-    std::shared_ptr<char[]> keyptr(new char[50]);// = std::make_shared<char[]>(new char[50]);
-    for(int i = 0; i < 50; i++)
-      keyptr[i] = key[i];
-
-    */
     std::string data_str = req.get_content();
 
     //convert data string to cstring
@@ -39,7 +32,6 @@ private:
       if(node->next_sibling() != nullptr && strcmp(node->name(), "first\n") && strcmp(node->next_sibling()->name(), "last\n")){
 
         ofile << "<email>" << node->value() << "." << node->next_sibling()->value() << "@smoothceeplusplus.com" << "</email>" << std::endl;
-        
         node = node->next_sibling();
       }	  
     }

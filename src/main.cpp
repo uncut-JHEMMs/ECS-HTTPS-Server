@@ -2,6 +2,7 @@
 #include "server/ServerConfiguration.h"
 #include <utility>
 #include <iostream>
+#include "server/charger_utils/DocumentSigning.h"
 
 int main(int argc, char** argv) {
 
@@ -26,7 +27,10 @@ int main(int argc, char** argv) {
 		 });
 
   Server server(std::move(cnf));
-  
+
+  //Temporary code.
+  DocumentSigning::setCert("pki/document/ca/certs/document.ca.cert.pem");
+  DocumentSigning::setPrivateKey("pki/document/ca/private/document.ca.key.pem");
   server.start(true);
   //getchar();
   //server.stop();
