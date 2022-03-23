@@ -1,7 +1,7 @@
 {
 	"port" : 8080,
 	"max_threads" : 4,	
-	"max_connections" : 15,
+	"max_connections" : 100,
 	"connection_timeout" : 180,
 	"server_ca" : "pki/server/ca/certs/server.ca.cert.pem",
 	"server_cert" : "pki/server/ca/certs/server.ca.cert.pem",
