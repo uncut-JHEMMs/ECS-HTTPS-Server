@@ -1,0 +1,23 @@
+{
+    "RCA" : {
+	"common_name" : "RCA",
+	"bits" : 4096,
+	"serial" : 1,
+	"cert_name" : "RCA"
+    },
+
+    "SCA" : {
+	"common_name" : "SCA",
+	"bits" : 2048,
+	"sertial" : 2,
+	"cert_name" : "SCA"
+    },
+
+    "DCA" : {
+	"common_name" : "DCA",
+	"bits" : 2048,
+	"serial" : 3,
+	"cert_name" : "DCA"
+    }
+}
+
