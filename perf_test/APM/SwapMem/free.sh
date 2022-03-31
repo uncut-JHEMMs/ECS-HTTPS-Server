@@ -15,6 +15,10 @@ do
     esac
 done
 
-free -h -t -w
+free -b -t -w -s 1 -c 3 | grep Swap: | cut -d ":" -f 2 >> tmpfile
+
+python3 SwapMem.py tmpfile
+
+rm -r tmpfile
 
 exit 0

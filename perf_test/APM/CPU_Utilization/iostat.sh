@@ -1,9 +1,12 @@
 #!/bin/bash
 
+time=1
+interval=3
+
 while getopts "c:i:" opt
 do
     case $opt in
-	c) count=$OPTARG
+	c) time=$OPTARG
 	   ;;
 	i) interval=$OPTARG
 	   ;;
@@ -12,5 +15,8 @@ do
     esac
 done
 
-iostat $count $interval -t -p ALL
+iostat $time $interval -c >> tmpfile
+
+#rm -r tmpfile
+
 exit 0
