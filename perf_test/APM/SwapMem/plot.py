@@ -1,5 +1,6 @@
 import sys
 import math
+import matplotlib.pyplot as plt
 
 def main():
     if len(sys.argv) < 2:
@@ -21,15 +22,15 @@ def main():
     averageUsed = swapMemUsed / 3
     averageFree = swapFree / 3
 
+    ifile.close()
+
     print("Swap memory statistics over 3 seconds.")
     print("Total Swap Mem Available: " + convert_size(totalSwapMemAvail))
     print("Average Swap Mem Used: " + convert_size(averageUsed))
     print("Average Free Swap Mem: " + convert_size(averageFree))
-        
-    ifile.close()
+
     
-#Gotten from
-#https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
+#Gotten from https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
 def convert_size(size_bytes):
     if size_bytes == 0:
         return "0B"

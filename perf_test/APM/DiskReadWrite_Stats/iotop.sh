@@ -1,7 +1,7 @@
 #!/bin/bash
 
 exec=exec
-
+iterations=3
 while getopts "e:n:" opt
 do
     case $opt in
@@ -22,11 +22,11 @@ then
     exit 1
 fi
 
-if [ $iterations > 0 ]
-then
-    sudo iotop -b -p $pid -n $iterations
-    exit 0
-else
-    sudo iotop -b -p $pid
-    exit 0
-fi
+sudo iotop -b -p $pid -n $iterations -k | grep -A 1 Total | awk -f awkFile.awk
+
+python3 plot.py tmpfile
+
+rm -r tmpfile
+
+exit 0
+

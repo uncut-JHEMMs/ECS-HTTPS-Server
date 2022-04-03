@@ -57,7 +57,7 @@ private:
   }
 
   //hash the data using sha1. Look into using something better.
-  std::stringstream hash_sha1(const std::string&& data){
+  std::stringstream hash_sha256(const std::string&& data){
     
     unsigned char* c_data = new unsigned char[data.size()];
     
@@ -66,7 +66,7 @@ private:
     }
     unsigned char hash[SHA_DIGEST_LENGTH];
     
-    SHA1(c_data, sizeof(data) - 1, hash);
+    SHA256(c_data, sizeof(data) - 1, hash);
 
     delete[] c_data;
     
@@ -180,12 +180,12 @@ public:
 	      << "<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" << std::endl
 	      << "<SignedInfo>" << std::endl
 	      << "<CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\" />" << std::endl
-	      << "<SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha1\" />" << std::endl
+	      << "<SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha256\" />" << std::endl
 	      << "<Reference URI=\"\">" << std::endl
 	      << "<Transforms>" << std::endl
 	      << "<Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\" />" << std::endl
 	      << "</Transforms>" << std::endl
-	      << "<DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha1\" />" << std::endl
+	      << "<DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha256\" />" << std::endl
 	      << "</Reference>" << std::endl
 	      << "</SignedInfo>" << std::endl
 	      << "<KeyInfo>" << std::endl
@@ -197,7 +197,7 @@ public:
     
     //possibility for poor performance
     //hash the data
-    std::stringstream hashed_data = hash_sha1(std::move(signature.str()));
+    std::stringstream hashed_data = hash_sha256(std::move(signature.str()));
     std::stringstream base64 = base64_Encode(hashed_data);
     std::string search = signature.str();
     
@@ -213,7 +213,7 @@ public:
     signature << search;
     
     //sign document using private key.
-    hashed_data = hash_sha1(std::move(signature.str()));
+    hashed_data = hash_sha256(std::move(signature.str()));
 
     std::string plaintext = hashed_data.str();
     unsigned char* encMessage;

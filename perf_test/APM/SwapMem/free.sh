@@ -15,10 +15,10 @@ do
     esac
 done
 
-free -b -t -w -s 1 -c 3 | grep Swap: | cut -d ":" -f 2 >> tmpfile
+free -b -w -s 1 -c 3 | grep Swap: | awk -f awkFile.awk
 
-python3 SwapMem.py tmpfile
+python3 plot.py tmpfile
 
-rm -r tmpfile
+#rm -r tmpfile
 
 exit 0
