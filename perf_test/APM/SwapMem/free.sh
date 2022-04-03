@@ -15,6 +15,10 @@ do
     esac
 done
 
-free -h -t -w
+free -b -w -s 1 -c 3 | grep Swap: | awk -f awkFile.awk
+
+python3 plot.py tmpfile
+
+#rm -r tmpfile
 
 exit 0

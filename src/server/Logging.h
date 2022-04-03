@@ -48,7 +48,7 @@ public:
 	queue.pop();
       }
       else
-	std::this_thread::yield();
+	std::this_thread::sleep_for(std::chrono::seconds(15));
     }
     while(!queue.empty()){
       m_file << queue.front();
