@@ -1,4 +1,4 @@
- #pragma once
+#pragma once
 
 #include <string_view>
 #include <openssl/sha.h>
@@ -12,6 +12,8 @@
 #include <utility>
 #include <string>
 #include "../Logging.h"
+
+#include <iostream>
 
 class DocumentSigning{
 private:
@@ -156,17 +158,20 @@ public:
   }
 
   //Takes a file to be signed and signs it.
-  bool sign(std::string&& filename){
+  bool sign(const std::string&& filename){
 
     if(certificate == "" || private_key == "")
       return false;
 
-    
     std::stringstream signature;
     signature << "<Envelope xmlns=\"urn:envelope\">" << std::endl
               << "<emails>" << std::endl;
 
     std::ifstream ifile(filename);
+    if(!ifile.is_open()){
+      return false;
+    }
+    
     std::string tmp = "";
     while(!ifile.eof()){
       ifile >> tmp;
@@ -174,7 +179,7 @@ public:
       tmp = "";
     }
     ifile.close();
-    
+
     //Set envelope template
     signature << "</emails>" << std::endl
 	      << "<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" << std::endl
@@ -197,6 +202,7 @@ public:
     
     //possibility for poor performance
     //hash the data
+
     std::stringstream hashed_data = hash_sha256(std::move(signature.str()));
     std::stringstream base64 = base64_Encode(hashed_data);
     std::string search = signature.str();
@@ -226,11 +232,11 @@ public:
     stringInsert(search, "<SignatureValue", ">", base64.str());
 
     //Insert the certificate into the document.
-    stringInsert(search, "<X509Certificate", ">", std::move(certificate));
+    stringInsert(search, "<X509Certificate", ">", "\n" + std::move(certificate));
 
     delete[] encMessage;
 
-    std::ofstream ofile(filename.c_str());
+    std::ofstream ofile("signedUserData.xml");
     ofile << search;
     ofile.close();
     

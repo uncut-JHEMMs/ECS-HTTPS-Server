@@ -9,6 +9,7 @@ do
 	c) count=$OPTARG
 	   ;;
 	h) echo "-c - gives the script a count of how many times to write lorem ipsum paragraph to data file."
+	   ;;
 	\?) echo "-$OPTARG: Requires Arguments"
     esac
 done

@@ -1,0 +1,29 @@
+{
+    "RCA" : {
+	"common_name" : "RCA",
+	"bits" : 4096,
+	"serial" : 1,
+	"cert_name" : "RCA",
+	"keyFileName" : "root/ca/private/root.ca.key.pem",
+	"certFileName" : "root/ca/certs/root.ca.cert.pem"
+    },
+
+    "SCA" : {
+	"common_name" : "SCA",
+	"bits" : 2048,
+	"sertial" : 2,
+	"cert_name" : "SCA",
+	"keyFileName" : "server/ca/private/server.ca.key.pem",
+	"certFileName" : "server/ca/certs/server.ca.cert.pem"
+    },
+
+    "DCA" : {
+	"common_name" : "DCA",
+	"bits" : 2048,
+	"serial" : 3,
+	"cert_name" : "DCA",
+	"keyFileName" : "document/ca/private/document.ca.key.pem",
+	"certFileName" : "document/ca/certs/document.ca.cert.pem"
+    }
+}
+
