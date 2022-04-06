@@ -5,10 +5,8 @@
 #include <fstream>
 #include <utility>
 #include "ServerConfiguration.h"
-#include "resources/Hello_World_Resource.h"
-#include "resources/Digest_Resource.h"
+#include "resources/Resources.h"
 #include "Logging.h"
-#include "resources/Email_Gen_resource.h"
 
 class Server{
 private:

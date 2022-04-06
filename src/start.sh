@@ -24,3 +24,4 @@ make
 ./exec $config
 
 make clean
+rm -r signedUserData.xml

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-clear
-
 size=0
 infile=""
 
@@ -40,13 +38,12 @@ then
 elif [ "$test" == "1" ]
 then
     echo "Improper number of files provided"
-    echo $size
     exit 1
 fi	   
 
 if [ -f $infile ] && [ "$infile" != "" ]
 then
-    clang++ -std=c++17 hash_by_sha1.cpp $(pkg-config --cflags --libs openssl) -ljsoncpp
+    clang++ -std=c++17 createCAs.cpp $(pkg-config --cflags --libs openssl) -ljsoncpp
     
     ./a.out $infile
     

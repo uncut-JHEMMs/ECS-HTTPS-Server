@@ -20,9 +20,10 @@ int main(int argc, char** args){
   }
 
   
-  std::wofstream ofile(args[2]);
-  std::ofstream seekPoints(args[3]);
-
+  std::wofstream csvOfile("../../src/server/resources/User_Emails_Resource/UserData.csv");
+  std::ofstream seekPoints("../../src/server/resources/User_Emails_Resource/seekPoints");
+  std::wofstream xmlOfile("../../src/server/resources/User_Emails_Resource/UserData.xml");
+  
   std::string data = "";
   char alt = 0;
   int id = 0;
@@ -31,7 +32,8 @@ int main(int argc, char** args){
   std::wstring fullname = L"";
   std::unordered_map<std::wstring, char> repeatChecks;
 
-  ofile << L"ID," << L"Firs Name," << L"Last Name," << "Email," << std::endl;
+  csvOfile << L"ID," << L"Firs Name," << L"Last Name," << "Email," << std::endl;
+  xmlOfile << "<Document>" << std::endl;
   
   while(!ifile.eof()){
     std::getline(ifile, data, '\n');
@@ -46,14 +48,23 @@ int main(int argc, char** args){
 
       alt = 0;
     }
-    seekPoints << ofile.tellp() << std::endl;
+    seekPoints << csvOfile.tellp() << std::endl;
 
     fullname = L"";
     
-    ofile << id++ << "," << fname << "," << lname << "," << fname << "." << lname << "@smoothceeplusplus.com" << std::endl;
-  }
+    csvOfile << id << "," << fname << "," << lname << "," << fname << "." << lname << "@smoothceeplusplus.com" << std::endl;
 
-  ofile.close();
+    xmlOfile << "\t<record>" << std::endl;
+    xmlOfile << "\t\t<id>" << id++ << "</id>" << std::endl;
+    xmlOfile << "\t\t<First>" << fname << "</First>" << std::endl;
+    xmlOfile << "\t\t<Last>" << lname << "</Last>" << std::endl;
+    xmlOfile << "\t\t<Email>" << fname << "." << lname << "@smoothceeplusplus.com" << std::endl;
+    xmlOfile << "\t</record>" << std::endl;
+  }
+  xmlOfile << "</Document>";
+  
+  csvOfile.close();
+  xmlOfile.close();
   ifile.close();
   seekPoints.close();
   

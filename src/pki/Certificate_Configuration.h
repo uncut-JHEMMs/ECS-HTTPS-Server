@@ -135,7 +135,7 @@ public:
     }
     
     try{
-      if((days = read[section].get("days", days).asUInt()) == days){
+      if((days = read[section].get("days", 60 * 60 * 24 * 365).asUInt()) == 60 * 60 * 24 * 365){
 
       }
     }
@@ -147,7 +147,7 @@ public:
     }
     
     try{
-      if((bits = read[section].get("bits", bits).asUInt()) == bits){
+      if((bits = read[section].get("bits", 2048).asUInt()) == 2048){
 
       }
     }

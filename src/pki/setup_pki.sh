@@ -2,7 +2,7 @@
 
 clear
 
-if [ $1 == test ] || [ $1 == Test ]
+if [ "$1" == test ] || [ "$1" == Test ]
 then
     #test if certificate was generated
     echo "Verify root CA certificate"
@@ -42,25 +42,44 @@ then
     #Generate CA.
 else
 
-    #Generate directories
-    ./createCA_Dir.sh root
-    
-    ./createCA_Dir.sh server
+    configFile=certificate_configurations.json
 
-    ./createCA_Dir.sh document
+    while getopts "i:h" opt
+    do
+	case $opt in
+	    i) configFile=$OPTARG
+	       ;;
+	    h) echo "-i: This takes as an argument a certificate configuration file in json form."
+	       echo "-h: Prints this information."
+	       ;;
+	    \?) echo "-$opt: Requires arguments."
+	esac
+    done
+
+    if [ -f $configFile ] && [ "$configFile" != "" ]
+    then
+
+	#Generate directories
+	./createCA_Dir.sh root
+	
+	./createCA_Dir.sh server
+	
+	./createCA_Dir.sh document
 
     mv openssl-sca.cnf server/ca/
     mv openssl-dca.cnf document/ca/
+
+    ./startCreateCAs.sh -i $configFile
     
     #Generate a private key for root
     key=root/ca/private/root.ca.key.pem
     cert=root/ca/certs/root.ca.cert.pem
     
-    openssl genrsa -out $key 4096
+    #openssl genrsa -out $key 4096
     chmod 400 $key
     
     #Generate the certificate authority for root.
-    openssl req -new -x509 -config openssl-rca.cnf -days 365000 -key $key -out $cert
+    #openssl req -new -x509 -config openssl-rca.cnf -days 365000 -key $key -out $cert
     chmod 444 $cert
 
     #Generate CRL for root
@@ -75,10 +94,10 @@ else
     cert=server/ca/certs/server.ca.cert.pem
     csr=server/ca/server.csr
 
-    ./createCSR.sh $key $csr
+    #./createCSR.sh $key $csr
     
     #Generate the server ca from csr
-    openssl ca -config openssl-rca.cnf -out $cert -in $csr
+    #openssl ca -config openssl-rca.cnf -out $cert -in $csr
 
     #Generate server CRL
     openssl ca -config openssl-rca.cnf -gencrl -out server/ca/crl/server.ca.crl
@@ -101,10 +120,10 @@ else
     csr=document/ca/document.csr
     
     #Generate the csr for document.
-    ./createCSR.sh $key $csr
+    #./createCSR.sh $key $csr
     
     #sign document csr
-    openssl ca -config openssl-rca.cnf -out $cert -in $csr
+    #openssl ca -config openssl-rca.cnf -out $cert -in $csr
 
     #Generate CRL for document
     openssl ca -config openssl-rca.cnf -gencrl -out document/ca/crl/document.ca.crl
@@ -117,5 +136,5 @@ else
     chmod 444 $cert
 
     openssl pkcs12 -export -out $pfx -inkey $key -in document/ca/certs/document.ca.cert.pem
-    
+    fi
 fi
