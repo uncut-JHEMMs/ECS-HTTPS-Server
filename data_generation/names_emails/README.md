@@ -1,0 +1,5 @@
+* The start.sh script does what the name suggests. It starts the main program (generate_name_emails.cpp) and the seekPointsTest program. To run the tests pass the command line flag -t followed by -s for seekPoints test.
+
+* generate_name_emails.cpp - This is the main program. It uses as a command line argument that is a list of user id's. If a csv file containing in the first column a list of user ids is provided to the script then these id's can be extracted and submitted to the generate_name_emails.cpp program. The script also ensures duplicated id's are skipped. This program outputs 3 files in its current state. A csv, xml, and seekpoints file. The csv and xml files are data files containing user data such as: id's, first and last names, and emails. This program also utilizes a serial file for storing an integer. This integer will be used to concatenate onto output file names. The output file names take the form of UserData.* and seekPoints.
+
+* testSeekPoints.cpp - This takes a seekPoints file and its associated data file and prints the data associated with seekPoint 3. This is a visual test meaning you would 

@@ -4,7 +4,7 @@
 
 int main(int argc, char** args){
 
-  if(argc < 2){
+  if(argc < 3){
     std::cerr << "ERR: seekpoints or input file not provided\n";
     return -1;
   }
@@ -22,11 +22,21 @@ int main(int argc, char** args){
   int point = std::stoi(seekPoint);
 
   dataFile.seekg(point, dataFile.beg);
-  
   std::getline(dataFile, dataPoint, '\n');
 
-  std::cout << dataPoint << std::endl;
-
+  dataFile.seekg(0, dataFile.beg);
+  std::string compare = "";
+  std::getline(dataFile, compare, '\n');
+  std::getline(dataFile, compare, '\n');
+  std::getline(dataFile, compare, '\n');
+  
+  if(dataPoint == compare){
+    std::cout << "Pass" << std::endl;
+  }
+  else{
+    std::cout << "Fail" << std::endl;
+  }
+  
   seekPoints.close();
   dataFile.close();
 
